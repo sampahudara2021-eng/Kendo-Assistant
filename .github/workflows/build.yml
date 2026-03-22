@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch:  # Bisa trigger manual dari GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,6 +22,13 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Download gradle-wrapper.jar
+      run: |
+        mkdir -p gradle/wrapper
+        curl -L "https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar" \
+          -o gradle/wrapper/gradle-wrapper.jar
+        echo "gradle-wrapper.jar size: $(wc -c < gradle/wrapper/gradle-wrapper.jar) bytes"
+
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
@@ -29,17 +36,16 @@ jobs:
       run: chmod +x gradlew
 
     - name: Build APK (Debug)
-      run: ./gradlew assembleDebug --no-daemon
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: SmartHome-APK
+        name: KendoAssistant-APK
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
 
     - name: Build info
       run: |
         echo "✅ APK berhasil dibuild!"
-        echo "📦 Ukuran APK:"
         ls -lh app/build/outputs/apk/debug/app-debug.apk
