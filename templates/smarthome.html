@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kendo Assistant — Smart Home</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: #1e293b;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-bar h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .home-icon {
+            width: 22px;
+            height: 22px;
+            color: #60a5fa;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            color: #94a3b8;
+            transition: background 0.2s, color 0.2s;
+        }
+        .settings-btn:hover { background: #334155; color: #e2e8f0; }
+
+        .main-content {
+            padding: 20px 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .status-bar {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-all {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+        .btn-all:active { transform: scale(0.97); }
+        .btn-all-on { background: #16a34a; color: #fff; }
+        .btn-all-off { background: #dc2626; color: #fff; }
+        .btn-all-on:hover { background: #15803d; }
+        .btn-all-off:hover { background: #b91c1c; }
+
+        .relays-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .relay-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .relay-card.on {
+            border-color: #3b82f6;
+            background: #1e3a5f;
+        }
+
+        .relay-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .relay-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .relay-id {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .relay-ip {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #334155;
+            border-radius: 13px;
+            transition: background 0.2s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #94a3b8;
+            border-radius: 50%;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        input:checked + .toggle-slider {
+            background: #2563eb;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background: #ffffff;
+        }
+
+        .relay-state-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            color: #64748b;
+        }
+
+        .relay-state-label.on { color: #60a5fa; }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #334155;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Settings modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: #1e293b;
+            border-radius: 16px 16px 0 0;
+            width: 100%;
+            max-width: 600px;
+            padding: 24px 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal h2 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        .settings-item {
+            margin-bottom: 16px;
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .settings-item label {
+            font-size: 12px;
+            color: #64748b;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .settings-item input {
+            flex: 1;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-family: monospace;
+        }
+
+        .settings-item input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            flex: 1;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-close {
+            background: #334155;
+            color: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            padding: 13px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: transform 0.3s;
+            z-index: 500;
+            white-space: nowrap;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="top-bar-left">
+        <svg class="home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <h1>Kendo Assistant</h1>
+    </div>
+    <button class="settings-btn" onclick="openSettings()" title="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+    </button>
+</div>
+
+<div class="main-content">
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span class="status-text">Server aktif — Kendo Assistant siap</span>
+    </div>
+
+    <div class="action-row">
+        <button class="btn-all btn-all-on" onclick="allOn()">Semua ON</button>
+        <button class="btn-all btn-all-off" onclick="allOff()">Semua OFF</button>
+    </div>
+
+    <div class="relays-grid" id="relaysGrid">
+        {% for device in devices %}
+        <div class="relay-card {% if device.state %}on{% endif %}" id="card-{{ device.id }}">
+            <div class="relay-header">
+                <div>
+                    <div class="relay-name" id="name-{{ device.id }}">{{ device.name }}</div>
+                    <div class="relay-id">Relay {{ device.id }}</div>
+                    <div class="relay-ip" id="ip-{{ device.id }}">{{ device.ip if device.ip else 'No IP' }}</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-{{ device.id }}"
+                        {% if device.state %}checked{% endif %}
+                        onchange="toggleRelay({{ device.id }}, this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="relay-state-label {% if device.state %}on{% endif %}" id="label-{{ device.id }}">
+                {% if device.state %}ON{% else %}OFF{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <h2>⚙️ Pengaturan Perangkat</h2>
+        <div id="settingsForm"></div>
+        <div class="modal-actions">
+            <button class="btn-close" onclick="closeSettings()">Batal</button>
+            <button class="btn-save" onclick="saveSettings()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const state = {};
+    {% for device in devices %}
+    state[{{ device.id }}] = {{ 'true' if device.state else 'false' }};
+    {% endfor %}
+
+    function showLoading() {
+        document.getElementById('loading').classList.add('active');
+    }
+
+    function hideLoading() {
+        document.getElementById('loading').classList.remove('active');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function updateCard(id, newState) {
+        state[id] = newState;
+        const card = document.getElementById('card-' + id);
+        const toggle = document.getElementById('toggle-' + id);
+        const label = document.getElementById('label-' + id);
+
+        if (newState) {
+            card.classList.add('on');
+            label.classList.add('on');
+            label.textContent = 'ON';
+        } else {
+            card.classList.remove('on');
+            label.classList.remove('on');
+            label.textContent = 'OFF';
+        }
+        toggle.checked = newState;
+    }
+
+    async function toggleRelay(id, checked) {
+        showLoading();
+        try {
+            const resp = await fetch('/api/relay/' + id + '/set', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: checked })
+            });
+            const data = await resp.json();
+            if (data.error) {
+                showToast('Error: ' + data.error);
+                updateCard(id, !checked);
+            } else {
+                updateCard(id, data.state);
+                showToast((data.name || 'Relay ' + id) + ' — ' + (data.state ? 'ON' : 'OFF'));
+            }
+        } catch (e) {
+            showToast('Gagal terhubung ke server');
+            updateCard(id, !checked);
+        }
+        hideLoading();
+    }
+
+    async function allOn() {
+        showLoading();
+        try {
+            const resp = await fetch('/api/relay/all-on', { method: 'POST' });
+            const data = await resp.json();
+            for (let i = 1; i <= 8; i++) updateCard(i, true);
+            showToast('Semua relay ON');
+        } catch (e) {
+            showToast('Gagal terhubung ke server');
+        }
+        hideLoading();
+    }
+
+    async function allOff() {
+        showLoading();
+        try {
+            const resp = await fetch('/api/relay/all-off', { method: 'POST' });
+            const data = await resp.json();
+            for (let i = 1; i <= 8; i++) updateCard(i, false);
+            showToast('Semua relay OFF');
+        } catch (e) {
+            showToast('Gagal terhubung ke server');
+        }
+        hideLoading();
+    }
+
+    async function openSettings() {
+        const resp = await fetch('/api/settings');
+        const devices = await resp.json();
+        const form = document.getElementById('settingsForm');
+        form.innerHTML = '';
+
+        devices.forEach(dev => {
+            form.innerHTML += `
+                <div class="settings-item">
+                    <label>Relay ${dev.id}</label>
+                    <div class="settings-row">
+                        <input type="text" id="sname-${dev.id}" placeholder="Nama perangkat" value="${dev.name}">
+                        <input type="text" id="sip-${dev.id}" placeholder="IP Tasmota" value="${dev.ip}">
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('settingsModal').classList.add('open');
+    }
+
+    function closeSettings() {
+        document.getElementById('settingsModal').classList.remove('open');
+    }
+
+    async function saveSettings() {
+        const devices = [];
+        for (let i = 1; i <= 8; i++) {
+            const nameEl = document.getElementById('sname-' + i);
+            const ipEl = document.getElementById('sip-' + i);
+            if (nameEl && ipEl) {
+                devices.push({ id: i, name: nameEl.value, ip: ipEl.value });
+            }
+        }
+
+        showLoading();
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ devices })
+            });
+            devices.forEach(d => {
+                const nameEl = document.getElementById('name-' + d.id);
+                const ipEl = document.getElementById('ip-' + d.id);
+                if (nameEl) nameEl.textContent = d.name;
+                if (ipEl) ipEl.textContent = d.ip || 'No IP';
+            });
+            closeSettings();
+            showToast('Pengaturan disimpan');
+        } catch (e) {
+            showToast('Gagal menyimpan pengaturan');
+        }
+        hideLoading();
+    }
+
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeSettings();
+    });
+</script>
+</body>
+</html>

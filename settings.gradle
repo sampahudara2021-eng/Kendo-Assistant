@@ -1,0 +1,2 @@
+rootProject.name = "SmartHomeRelay"
+include ':app'

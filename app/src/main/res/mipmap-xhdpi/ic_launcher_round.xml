@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Lingkaran background -->
+    <path android:fillColor="#0c4a6e"
+        android:pathData="M54,0 A54,54 0 1,1 53.999,0 Z"/>
+
+    <!-- Badan rumah -->
+    <path android:fillColor="#0369a1"
+        android:pathData="M22,64 L22,88 L86,88 L86,64 Z"/>
+
+    <!-- Atap -->
+    <path android:fillColor="#0284c7"
+        android:pathData="M14,64 L54,28 L94,64 Z"/>
+
+    <!-- Pintu -->
+    <path android:fillColor="#0c4a6e"
+        android:pathData="M44,88 L44,68 Q44,64 48,64 L60,64 Q64,64 64,68 L64,88 Z"/>
+
+    <!-- WiFi arcs -->
+    <path android:fillColor="#38bdf8" android:strokeWidth="0"
+        android:pathData="M66,22 Q78,14 90,22 Q78,18 66,22 Z"/>
+    <path android:fillColor="#7dd3fc" android:strokeWidth="0"
+        android:pathData="M69,30 Q78,24 87,30 Q78,27 69,30 Z"/>
+    <path android:fillColor="#bae6fd" android:strokeWidth="0"
+        android:pathData="M72,38 Q78,33 84,38 Q78,36 72,38 Z"/>
+    <path android:fillColor="#e0f2fe"
+        android:pathData="M75,44 Q78,41 81,44 Q78,47 75,44 Z"/>
+
+    <!-- Koneksi sinyal ke rumah -->
+    <path android:fillColor="#38bdf8"
+        android:pathData="M78,47 L78,51 Q78,53 76,53 L66,53 Q64,53 64,55 L64,59 Q64,61 62,61 L58,61"/>
+</vector>

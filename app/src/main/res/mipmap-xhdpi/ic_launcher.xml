@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background biru tua -->
+    <path android:fillColor="#0c4a6e"
+        android:pathData="M0,0 L108,0 L108,108 L0,108 Z"/>
+
+    <!-- Rounded rect background sudut -->
+    <path android:fillColor="#0c4a6e"
+        android:pathData="M18,0 L90,0 Q108,0 108,18 L108,90 Q108,108 90,108 L18,108 Q0,108 0,90 L0,18 Q0,0 18,0 Z"/>
+
+    <!-- Badan rumah (dinding) -->
+    <path android:fillColor="#0369a1"
+        android:pathData="M24,62 L24,90 L84,90 L84,62 Z"/>
+
+    <!-- Atap rumah (segitiga) -->
+    <path android:fillColor="#0284c7"
+        android:pathData="M16,62 L54,28 L92,62 Z"/>
+
+    <!-- Pintu -->
+    <path android:fillColor="#0c4a6e"
+        android:pathData="M44,90 L44,68 Q44,64 48,64 L60,64 Q64,64 64,68 L64,90 Z"/>
+
+    <!-- Sinyal WiFi besar kiri atas rumah -->
+    <path android:fillColor="#38bdf8" android:strokeWidth="0"
+        android:pathData="M68,22 Q80,14 92,22 Q80,18 68,22 Z"/>
+    <!-- Arc WiFi 1 (luar) -->
+    <path android:fillColor="#7dd3fc" android:strokeWidth="0"
+        android:pathData="M71,30 Q80,23 89,30 Q80,26 71,30 Z"/>
+    <!-- Arc WiFi 2 (tengah) -->
+    <path android:fillColor="#bae6fd" android:strokeWidth="0"
+        android:pathData="M74,38 Q80,33 86,38 Q80,35 74,38 Z"/>
+    <!-- Titik WiFi -->
+    <path android:fillColor="#e0f2fe"
+        android:pathData="M77,44 Q80,41 83,44 Q80,47 77,44 Z"/>
+
+    <!-- Garis sinyal ke rumah (dashed look - 3 segment) -->
+    <path android:fillColor="#38bdf8"
+        android:pathData="M80,47 L80,50 Q80,52 78,52 L68,52 Q66,52 66,54 L66,58 Q66,60 64,60 L60,60"/>
+</vector>

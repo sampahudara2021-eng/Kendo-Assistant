@@ -1,0 +1,2 @@
+-keep class com.smarthome.relay.** { *; }
+-keepattributes *Annotation*
